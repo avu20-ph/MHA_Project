@@ -14,8 +14,6 @@
 #install.packages("ggeffects")
 #install.packages("patchwork")
 
-aaa
-
 library(here)
 library(tidyverse) #For data manipulation and visualization
 library(openxlsx) #For reading Excel files
@@ -28,7 +26,7 @@ library(ggeffects) #For visualizing LMM results
 library(patchwork) #For combining ggplots
 
 #File path
-mha <- read.xlsx(here("data", "MHADatabase_DATA_2026-01-20OD.xlsx"), detectDates = TRUE)
+mha <- read.xlsx(here("Data", "MHADatabase_DATA_2026-01-20OD.xlsx"), detectDates = TRUE)
 mha <- rename(mha, instrument_name=redcap_repeat_instrument, repeat_instance=redcap_repeat_instance)
 
 #Cleaning MHA Database---------------------------------------------------------------------------------
