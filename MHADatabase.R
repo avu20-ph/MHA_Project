@@ -171,6 +171,7 @@ baseline_wide %>% count(client_profile_legal_status) %>%
 ggplot(aes(fct_reorder(client_profile_legal_status, n, .desc = TRUE), n)) + geom_col()+
 geom_text(aes(label = n), vjust = -0.5, size = 4) +
 labs(title = "Legal Status Distribution", x = "Legal Status", y = "Count") + theme_minimal()
+legal_status_vis
 #Gender distribution
 gender_vis <- baseline_wide %>% count(client_profile_gender) %>% 
 mutate(percent = n / sum(n) * 100) %>% arrange(desc(n))
@@ -178,6 +179,7 @@ baseline_wide %>% count(client_profile_gender) %>%
 ggplot(aes(fct_reorder(client_profile_gender, n, .desc = TRUE), n)) + geom_col()+
 geom_text(aes(label = n), vjust = -0.5, size = 4) +
 labs(title = "Gender Distribution", x = "Gender", y = "Count") + theme_minimal()
+gender_vis
 #Marital status distribution
 marital_status_vis <- baseline_wide %>% count(client_profile_marital_status) %>% 
 mutate(percent = n / sum(n) * 100) %>% arrange(desc(n))
@@ -185,6 +187,7 @@ baseline_wide %>% count(client_profile_marital_status) %>%
 ggplot(aes(fct_reorder(client_profile_marital_status, n, .desc = TRUE), n)) + geom_col()+
 geom_text(aes(label = n), vjust = -0.5, size = 4) +
 labs(title = "Marital Status Distribution", x = "Marital Status", y = "Count") + theme_minimal()
+marital_status_vis
 #Nationality distribution
 nationality_vis <- baseline_wide %>% count(client_profile_nationality) %>% 
 mutate(percent = n / sum(n) * 100) %>% arrange(desc(n))
@@ -192,6 +195,7 @@ baseline_wide %>% count(client_profile_nationality) %>%
 ggplot(aes(fct_reorder(client_profile_nationality, n, .desc = TRUE), n)) + geom_col()+
 geom_text(aes(label = n), vjust = -0.5, size = 4) +
 labs(title = "Nationality Distribution", x = "Nationality", y = "Count") + theme_minimal()
+nationality_vis
 #Primary language distribution
 primary_language_vis <- baseline_wide %>% count(client_profile_primary_language) %>% 
 mutate(percent = n / sum(n) *100) %>% arrange(desc(n))
@@ -199,6 +203,7 @@ baseline_wide %>% count(client_profile_primary_language) %>%
 ggplot(aes(fct_reorder(client_profile_primary_language, n, .desc = TRUE), n)) + geom_col()+
 geom_text(aes(label = n), vjust = -0.5, size = 4) +
 labs(title = "Primary Language Distribution", x = "Primary Language", y = "Count") + theme_minimal()
+primary_language_vis
 #English level distribution
 english_level_vis <- baseline_wide %>% count(client_profile_english_level) %>% 
 mutate(percent = n / sum(n) * 100) %>% arrange(desc(n))
@@ -207,6 +212,7 @@ levels = c(0, 1, 2, 3), labels = c("None", "Some", "Good", "Excellent"))) %>%
 count(english_level) %>% ggplot(aes(english_level, n)) + geom_col() +
 geom_text(aes(label = n), vjust = -0.5, size = 4) + 
 labs(title = "English Level Distribution", x = "English Proficiency", y = "Count") + theme_minimal()
+english_level_vis
 
 #Calculating age at intake and time since arrival in months and years
 baseline_wide <- baseline_wide %>% mutate(
@@ -233,6 +239,7 @@ tab_options(row_group.font.weight = "bold",
       row_group.padding = px(2),
       column_labels.padding = px(2),
       heading.padding = px(2))
+age_summary_table
 
 #Creating age group variable; One group 18-34 (n = 9) and other 35+ (n = 10); Based on median
 #Calculate age groups based on median (34)
@@ -270,6 +277,7 @@ tab_options(row_group.font.weight = "bold",
       column_labels.padding = px(2),
       heading.padding = px(2)) %>%
 tab_style(style = cell_fill(color = "#ffeeee"), locations = cells_row_groups())
+demographics_table
 
 #Baseline Psychlops------------------------------------------------------------------------------------
 #How much has it affected you over the last week?: 0-5 = Not at all-Severely Affected
@@ -419,7 +427,7 @@ baseline_assessment_summary <- baseline_wide %>% summarize(
 mutate(Statistic = c("Mean", "Median", "Min", "Max", "SD")) %>%
 pivot_longer(-Statistic, names_to = "Assessment", values_to = "Value") %>%
 pivot_wider(names_from = Statistic, values_from = Value)
-
+baseline_assessment_summary
 
 baseline_scores_table <- baseline_assessment_summary %>% gt() %>% tab_header(
 title = "Baseline Clinical Assessment Summary") %>%
@@ -434,6 +442,7 @@ tab_options(row_group.font.weight = "bold",
       row_group.padding = px(2),
       column_labels.padding = px(2),
       heading.padding = px(2))
+baseline_scores_table     
 
 #Creating data frames for follow-up and post-therapy assessments---------------------------------------
 during_psych <- mha_clean %>% filter(instrument_name == "psychlops_duringtherapy")
@@ -525,6 +534,7 @@ stat_summary(aes(group = 1), fun = mean, geom = "line", linewidth = 1.2, color =
 facet_wrap(~instrument, scales = "free") + theme_minimal() + labs(title = "Treatment Progress by Instrument",
 subtitle = "Red lines represents the mean score.\nHSCH-25 was not administered at Post-Therapy.", 
 x = NULL, y = "Score")
+psych_hopkins_change
 
 #Linear Mixed Models (LMM)-----------------------------------------------------------------------------
       #t-test was considered but not used since only four participants have both baseline and post-therapy data for PSYCHLOPS and since it does not include all available data
@@ -557,11 +567,15 @@ anova(hopkins_model)
 
 #Checking assumptions of LMMs
 #Check homoscedasticity (residuals have constant variance across fitted values); Appears to be relatively homoscedastic for both models
-plot(psychlops_model, main = "PSYCHLOPS Model: Residuals vs Fitted") 
-plot(hopkins_model, main = "Hopkins Model: Residuals vs Fitted")
+psychlops_residual <- plot(psychlops_model, main = "PSYCHLOPS Model: Residuals vs Fitted") 
+psychlops_residual
+hopkins_residual <- plot(hopkins_model, main = "Hopkins Model: Residuals vs Fitted")
+hopkins_residual
 #Check normality; Appears to be relatively normal for both models
-qqPlot(residuals(psychlops_model), main = "PSYCHLOPS Model: Q-Q Plot of Residuals")
-qqPlot(residuals(hopkins_model), main = "Hopkins Model: Q-Q Plot of Residuals")
+psychlops_qq <- qqPlot(residuals(psychlops_model), main = "PSYCHLOPS Model: Q-Q Plot of Residuals")
+psychlops_qq
+hopkins_qq <- qqPlot(residuals(hopkins_model), main = "Hopkins Model: Q-Q Plot of Residuals")
+hopkins_qq
 
 #LMM for PSYCHLOPS for dose-response relationship
 #psychlops_sessions <- analysis_long %>% group_by(record_id) %>% 
@@ -665,6 +679,7 @@ model_term <- function(x) {x %>%
       str_replace("legal_status_simple", "Legal Status") %>%
       str_replace("region", "Region") %>%
       str_replace("age_group", "Age Group")}
+subgroup_table
 
 subgroup_table1 <- subgroup_table %>% filter(`Pr(>F)` < 0.05, Effect != "timepoint", 
 Effect != "client_profile_gender") %>% 
@@ -688,6 +703,7 @@ tab_options(row_group.font.weight = "bold",
       heading.padding = px(2)) %>%
 tab_style(style = cell_fill(color = "#ffeeee"), locations = cells_row_groups()) %>%
 tab_footnote(footnote = "Only effects with p<.05 are shown")
+subgroup_table1
 
 #mutate(sig = case_when( 
 #`p-value` < .001 ~ "***",
@@ -700,6 +716,7 @@ ggplot(aes(x = timepoint, y = score, group = record_id, color = client_profile_g
 geom_line(alpha = 0.4) + stat_summary(aes(group = client_profile_gender), fun = mean, geom = "line", linewidth = 1.5) +
 facet_wrap(~client_profile_gender) + theme_minimal() + labs(title = "PSYCHLOPS Improvement by Gender",
 subtitle = "Significant interaction found (p = .003)", x = "Timepoint", y = "PSYCHLOPS Score") + theme(legend.position = "none")
+psychlops_subgroup_gender_vis
 #Visualizing PSYCHLOPS improvement rates by Legal Status
 psychlops_subgroup_legal_vis <- analysis_long_demo %>% filter(instrument == "PSYCHLOPS") %>%
 ggplot(aes(x = timepoint, y = score, group = record_id, color = legal_status_simple)) +
@@ -707,12 +724,14 @@ geom_line(alpha = 0.4) +  stat_summary(aes(group = legal_status_simple), fun = m
 facet_wrap(~legal_status_simple) + theme_minimal() + labs(title = "PSYCHLOPS Improvement by Legal Status",
 subtitle = "Significant interaction (p = .033); 'Other' group limited to Follow-up", 
 x = "Timepoint", y = "PSYCHLOPS Score") + theme(legend.position = "none")
+psychlops_subgroup_legal_vis
 #Visualizing PSYCHLOPS improvement rates by Region
 psychlops_subgroup_region_vis <- analysis_long_demo %>% filter(instrument == "PSYCHLOPS") %>%
 ggplot(aes(x = timepoint, y = score, group = record_id, color = region)) + 
 geom_line(alpha = 0.4) + stat_summary(aes(group = region), fun = mean, geom = "line", linewidth = 1.5) +
 facet_wrap(~region) + theme_minimal() + labs(title = "PSYCHLOPS Improvement by Region",
 subtitle = "Significant interaction (p = .022)", x = "Timepoint", y = "PSYCHLOPS Score") + theme(legend.position = "none")
+psychlops_subgroup_region_vis
 #Visualizing PSYCHLOPS improvement rates by Primary Language
 psychlops_subgroup_language_vis <- analysis_long_demo %>% filter(instrument == "PSYCHLOPS") %>%
 ggplot(aes(x = timepoint, y = score, group = record_id, color = language_simple)) + geom_line(alpha = 0.4) + 
@@ -720,8 +739,10 @@ stat_summary(aes(group = language_simple), fun = mean, geom = "line", linewidth 
 facet_wrap(~language_simple) + theme_minimal() + labs(title = "PSYCHLOPS Improvement by Primary Language",
 subtitle = "Significant interaction (p = .013); 'Other' group limited to Follow-up", 
 x = "Timepoint", y = "PSYCHLOPS Score") + theme(legend.position = "none")
+psychlops_subgroup_language_vis
 combined_psychlops_vis <- psychlops_subgroup_gender_vis + psychlops_subgroup_region_vis + psychlops_subgroup_legal_vis + psychlops_subgroup_language_vis +
 plot_layout(ncol = 2)
+combined_psychlops_vis
 
 #Visualizing PSYCHLOPS improvement rates by Gender
 #gender_pred <- ggpredict(gender_improvement_model, terms = c("timepoint", "client_profile_gender"))
@@ -792,6 +813,7 @@ tab_options(row_group.font.weight = "bold",
       column_labels.padding = px(2),
       heading.padding = px(2)) #%>%
 #tab_footnote(footnote = "Sample sizes: Baseline n=20; Follow-up n=27; Post-Therapy n=4; Hopkins Follow-up n=8.")
+psychlops_emmeans_table
 
 #Visualize estimated marginal means for PSYCHLOPS model
 psychlops_emmeans_vis <- psychlops_emmeans %>% ggplot(aes(timepoint, emmean, group = 1)) +
@@ -800,6 +822,7 @@ geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = 0.1) +
 theme_minimal() + labs(title = "Estimated PSYCHLOPS Score Trend", 
 subtitle = "Error bars represent 95% Confidence Intervals", 
 x = "Assessment Timepoint", y = "Predicted PSYCHLOPS Score")
+psychlops_emmeans_vis
 
 #EMM and pairwise comparisons for Hopkins model
 hopkins_comparisons <- emmeans(hopkins_model, pairwise ~ timepoint)
@@ -835,6 +858,7 @@ tab_options(row_group.font.weight = "bold",
       column_labels.padding = px(2),
       heading.padding = px(2)) #%>%
 #tab_footnote(footnote = "Sample sizes: Baseline n=20; Follow-up n=27; Post-Therapy n=4; Hopkins Follow-up n=8.")
+psychlops_effect_size_table
 
 #Visualize effect sizes for PSYCHLOPS Model
 psychlops_effect_size_vis <- psychlops_effect_size_renamed %>%
@@ -886,6 +910,7 @@ tab_options(row_group.font.weight = "bold",
       row_group.padding = px(2),
       column_labels.padding = px(2),
       heading.padding = px(2))
+attrition_stats
 
 #Comparing baseline distress by subgroup---------------------------------------------------------------
 #Select demographic predictors
@@ -944,6 +969,7 @@ tab_options(row_group.font.weight = "bold",
 tab_style(style = cell_fill(color = "#ffeeee"), locations = cells_row_groups()) %>%
 tab_style(style = list(cell_text(weight = "bold")),
 locations = cells_body(columns = p.value, rows = p.value < 0.05))
+psychlops_subgroup_differences
 
 #Baseline PSYCHLOPS total scores by gender boxplot
 psychlops_gender_anova_vis <- baseline_wide %>% filter(client_profile_gender != "Unknown") %>%
@@ -952,6 +978,7 @@ geom_boxplot(alpha = 0.6) + geom_jitter(width = 0.1, size = 2) +
 scale_fill_brewer(palette = "Set1") + labs(title = "Baseline PSYCHLOPS Scores by Gender", 
 subtitle = "Significant difference found (p = .001)", 
 x = NULL, y = "PSYCHLOPS Score") + theme_minimal() + theme(legend.position = "none")
+psychlops_gender_anova_vis
 
 #Mean, min, and max for Baseline PSYCHLOPS by gender
 baseline_wide %>% filter(client_profile_gender != "Unknown") %>%
@@ -961,11 +988,10 @@ min_score = min(pre_psych_total, na.rm = TRUE),
 max_score = max(pre_psych_total, na.rm = TRUE),
 sample_size = n())
 
-
-#invisible(View(mha_clean))
-#invisible(View(baseline_wide))
-#invisible(View(followup_wide))
-#invisible(View(analysis_long))
+invisible(View(mha_clean))
+invisible(View(baseline_wide))
+invisible(View(followup_wide))
+invisible(View(analysis_long))
 
 
 #Thematic Analysis-------------------------------------------------------------------------------------
