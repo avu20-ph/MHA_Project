@@ -26,6 +26,7 @@ library(ggeffects) #For visualizing LMM results
 library(patchwork) #For combining ggplots
 
 #File path
+here()
 mha <- read.xlsx(here("Data", "MHADatabase_DATA_2026-01-20OD.xlsx"), detectDates = TRUE)
 mha <- rename(mha, instrument_name=redcap_repeat_instrument, repeat_instance=redcap_repeat_instance)
 
